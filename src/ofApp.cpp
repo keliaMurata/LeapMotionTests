@@ -4,7 +4,7 @@ ofApp::ofApp()
 {
 }
 
-ofApp::~ofApp()
+ofApp::~ofApp() //this will stop pulling data from the leap when the app is closed, so that it isn't secretly, unintentionally still tracking
 {
 	if (leap != NULL)
 	{
@@ -15,64 +15,64 @@ ofApp::~ofApp()
 
 void ofApp::setup()
 {
-	leap = new ofxLeapMotion();
-	leap->open();
-	leap->setupGestures();
+	leap = new ofxLeapMotion(); //assigns a leap
+	leap->open(); //initiates tracking with the leap
+	leap->setupGestures(); //sets up the gestures
 
-	font.loadFont("Fonts/DIN.otf", 12);
+	font.loadFont("Fonts/DIN.otf", 12); //loads a font to be used
 }
 
 void ofApp::update()
 {
-	camera.setGlobalPosition(0, 200, 400);
+	camera.setGlobalPosition(0, 200, 400); //sets up a camera so our hands are actually visible on screen
 
-	if (leap->isFrameNew())
+	if (leap->isFrameNew()) //if the leap data has changed (we moved our hands)...
 	{
-		hands = leap->getSimpleHands();
-		leap->updateGestures();
+		hands = leap->getSimpleHands(); //uses the getSimpleHands function from the leap addon
+		leap->updateGestures(); //updates the gestures with the new information
 	}
 }
 
 void ofApp::draw()
 {
-	camera.begin();
+	camera.begin(); //starts the camera
 
-	ofEnableDepthTest();
+	ofEnableDepthTest(); //lets us have z space
 
-	ofClear(ofColor::gray);
+	ofClear(ofColor::gray); //bg color
 
-	for (auto iter = hands.begin(); iter != hands.end(); ++iter)
+	for (auto iter = hands.begin(); iter != hands.end(); ++iter) //go through each hand that is detected
 	{
-		for (auto iter2 = iter->fingers.begin(); iter2 != iter->fingers.end(); ++iter2)
+		for (auto iter2 = iter->fingers.begin(); iter2 != iter->fingers.end(); ++iter2) //go through each finger on each hand that is detected
 		{
-			ofSetColor(ofColor::blue);
+			ofSetColor(ofColor::blue); //blue circles for metacarpals (bones in the back of the hand)
 			ofCircle(iter2->second.mcp, 5);
 
-			ofSetColor(ofColor::green);
+			ofSetColor(ofColor::green); //green for first knuckles
 			ofCircle(iter2->second.pip, 5);
 
-			ofSetColor(ofColor::red);
+			ofSetColor(ofColor::red); //red for second knuckles
 			ofCircle(iter2->second.dip, 5);
 
-			ofSetColor(ofColor::yellow);
+			ofSetColor(ofColor::yellow); //yellow for the tip
 			ofCircle(iter2->second.tip, 5);
 
-			ofSetColor(ofColor::black);
+			ofSetColor(ofColor::black); //black triangles that follow the finger tips when they move
 			ofLine(iter2->second.mcp, iter2->second.pip);
 			ofLine(iter2->second.pip, iter2->second.dip);
 			ofLine(iter2->second.dip, iter2->second.tip);
 
-			ofDrawArrow(iter2->second.pos, iter2->second.pos + iter2->second.vel / 3, iter2->second.vel.distance(ofVec3f(0, 0, 0)) / 20);
+			ofDrawArrow(iter2->second.pos, iter2->second.pos + iter2->second.vel / 3, iter2->second.vel.distance(ofVec3f(0, 0, 0)) / 20); //the arrows will change size based on velocity and dis moved
 		}
 
-		iter->isLeft ? ofSetColor(ofColor::green) : ofSetColor(ofColor::red);
-		ofDrawArrow(iter->handPos, iter->handPos + (iter->handNormal * 20), 5.0f);
+		iter->isLeft ? ofSetColor(ofColor::green) : ofSetColor(ofColor::red); //dots for the palms based on which hand it is (green for left, red for right?)
+		ofDrawArrow(iter->handPos, iter->handPos + (iter->handNormal * 20), 5.0f); //an arrow that follows the swipe of the hand
 	}
 
-	ofSetColor(ofColor::white);
-	switch (leap->iGestures)
+	ofSetColor(ofColor::white); //color for the font
+	switch (leap->iGestures) //depending on what gesture is made (or, what the computer thinks is made), this will type the name
 	{
-	case SCREEN_TAP:
+	case SCREEN_TAP: //this moves through the enum to determine which case (gesture) has happened and writes the appropriate name
 		font.drawString("Screen Tap", 2, 2);
 		break;
 	case KEY_TAP:
@@ -104,7 +104,7 @@ void ofApp::draw()
 		break;
 	}
 
-	ofDisableDepthTest();
+	ofDisableDepthTest(); //ends the depth test (if we wanted to put other things on screen, it would go after this)
 
-	camera.end();
+	camera.end(); //stops the camera (other things after this wouldn't be seen by it)
 }

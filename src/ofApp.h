@@ -3,7 +3,7 @@
 #include "ofMain.h"
 #include "ofxLeapMotion2.h"
 
-enum Gesture
+enum Gesture //this will be used for determining which gesture has been performed and what to do with it
 {
 	NONE = 0,
 	SCREEN_TAP = 1,
@@ -28,8 +28,8 @@ public:
 	void draw();
 
 private:
-	ofxLeapMotion* leap;
-	vector<ofxLeapMotionSimpleHand> hands;
+	ofxLeapMotion* leap; //the Leap that is detected by the computer
+	vector<ofxLeapMotionSimpleHand> hands; //vector for hands detected
 	ofEasyCam camera;
 	ofTrueTypeFont font;
 };
